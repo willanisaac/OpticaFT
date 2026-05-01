@@ -1,0 +1,22 @@
+/* =====================================================
+   Paleta global — Opción 2: Contraste Moderno
+   ===================================================== */
+:root {
+  --primary:    #02d3ce;   /* Primario   */
+  --secondary:  #a5ba07;   /* Secundario */
+  --background: #ffffff;   /* Fondo      */
+  --accent:     #f4dab5;   /* Acento     */
+  --dark:       #513e37;   /* Oscuro     */
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--background);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  color: var(--dark);
+}
