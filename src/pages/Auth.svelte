@@ -20,6 +20,12 @@
     const normalizedPath = path.startsWith('/') ? path : `/${path}`;
     return base ? `${base}${normalizedPath}` : normalizedPath;
   }
+
+  function clientNavigate(path) {
+    const target = toAppPath(path);
+    window.history.pushState(null, '', target);
+    window.dispatchEvent(new PopStateEvent('popstate'));
+  }
   // Spanish-only labels
   const t = {
     auth: {
@@ -94,8 +100,8 @@
         if (err) {
           error = err.message || t.auth.errors.loginError;
         } else {
-          // authenticated — redirect to dashboard
-          window.location.href = toAppPath('/dashboard');
+          // authenticated — navigate in SPA mode
+          clientNavigate('/dashboard');
         }
       } else {
         const { data, error: err } = await supabase.auth.signUp({ email, password, options: { data: { full_name: displayName } } });
@@ -104,7 +110,7 @@
         } else {
           // if user is returned and session exists, navigate to dashboard; otherwise show success message
           if (data?.user) {
-            window.location.href = toAppPath('/dashboard');
+            clientNavigate('/dashboard');
           } else {
             alert(t.auth.signupSuccess);
             isLogin = true;

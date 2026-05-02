@@ -51,13 +51,6 @@
     display: block;
   }
 
-  .topbar-title {
-    color: #1F1F1F;
-    font-weight: 700;
-    font-size: 1rem;
-    letter-spacing: 0.02em;
-  }
-
   .search-wrapper {
     flex: 1;
     max-width: 420px;
