@@ -13,6 +13,13 @@
   let displayName = '';
   let error = '';
   let loading = false;
+  const BASE_URL = import.meta.env.BASE_URL || '/';
+
+  function toAppPath(path) {
+    const base = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL;
+    const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+    return base ? `${base}${normalizedPath}` : normalizedPath;
+  }
   // Spanish-only labels
   const t = {
     auth: {
@@ -88,7 +95,7 @@
           error = err.message || t.auth.errors.loginError;
         } else {
           // authenticated — redirect to dashboard
-          window.location.href = '/dashboard';
+          window.location.href = toAppPath('/dashboard');
         }
       } else {
         const { data, error: err } = await supabase.auth.signUp({ email, password, options: { data: { full_name: displayName } } });
@@ -97,7 +104,7 @@
         } else {
           // if user is returned and session exists, navigate to dashboard; otherwise show success message
           if (data?.user) {
-            window.location.href = '/dashboard';
+            window.location.href = toAppPath('/dashboard');
           } else {
             alert(t.auth.signupSuccess);
             isLogin = true;

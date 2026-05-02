@@ -12,6 +12,7 @@
   let userEmail = '';
   let isAuthenticated = false;
   let sidebarCollapsed = false;
+  const BASE_PATH = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '');
 
   const AUTH_ROUTES = ['/auth'];
   $: showShell = !AUTH_ROUTES.includes(currentRoute);
@@ -21,10 +22,23 @@
     return !AUTH_ROUTES.includes(pathname);
   }
 
+  function withBase(path) {
+    const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+    return BASE_PATH ? `${BASE_PATH}${normalizedPath}` : normalizedPath;
+  }
+
+  function stripBase(pathname) {
+    if (!pathname) return '/';
+    if (!BASE_PATH) return pathname;
+    if (pathname === BASE_PATH) return '/';
+    return pathname.startsWith(BASE_PATH) ? pathname.slice(BASE_PATH.length) || '/' : pathname;
+  }
+
   function normalizePath(pathname) {
-    if (!pathname || pathname === '/') return '/auth';
-    if (pathname.length > 1 && pathname.endsWith('/')) return pathname.slice(0, -1);
-    return pathname;
+    const withoutBase = stripBase(pathname);
+    if (!withoutBase || withoutBase === '/') return '/auth';
+    if (withoutBase.length > 1 && withoutBase.endsWith('/')) return withoutBase.slice(0, -1);
+    return withoutBase;
   }
 
   function resolveComponent(pathname) {
@@ -37,7 +51,7 @@
   }
 
   function navigate(path) {
-    window.history.pushState(null, '', path);
+    window.history.pushState(null, '', withBase(path));
     syncRoute();
   }
 
@@ -51,8 +65,9 @@
     if (isProtectedRoute(normalized) && !isAuthenticated) {
       currentRoute = '/auth';
       CurrentComponent = Auth;
-      if (replace || window.location.pathname !== '/auth') {
-        window.history.replaceState(null, '', '/auth');
+      const authUrl = withBase('/auth');
+      if (replace || window.location.pathname !== authUrl) {
+        window.history.replaceState(null, '', authUrl);
       }
       return;
     }
@@ -60,16 +75,18 @@
     if (normalized === '/auth' && isAuthenticated) {
       currentRoute = '/dashboard';
       CurrentComponent = Dashboard;
-      if (replace || window.location.pathname !== '/dashboard') {
-        window.history.replaceState(null, '', '/dashboard');
+      const dashboardUrl = withBase('/dashboard');
+      if (replace || window.location.pathname !== dashboardUrl) {
+        window.history.replaceState(null, '', dashboardUrl);
       }
       return;
     }
 
     currentRoute = normalized;
     CurrentComponent = resolveComponent(normalized);
-    if (replace && window.location.pathname !== normalized) {
-      window.history.replaceState(null, '', normalized);
+    const targetUrl = withBase(normalized);
+    if (replace && window.location.pathname !== targetUrl) {
+      window.history.replaceState(null, '', targetUrl);
     }
   }
 
