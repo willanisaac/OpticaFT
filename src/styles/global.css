@@ -1,12 +1,13 @@
 /* =====================================================
-   Paleta global — Opción 2: Contraste Moderno
+   Paleta global — VEXAL
    ===================================================== */
 :root {
-  --primary:    #02d3ce;   /* Primario   */
-  --secondary:  #a5ba07;   /* Secundario */
-  --background: #ffffff;   /* Fondo      */
-  --accent:     #f4dab5;   /* Acento     */
-  --dark:       #513e37;   /* Oscuro     */
+  --primary:    #66D7B7;   /* Verde menta       */
+  --background: #ffffff;   /* Fondo blanco      */
+  --dark:       #1F1F1F;   /* Negro/texto       */
+  /* aliases utilitarios */
+  --secondary:  #66D7B7;
+  --accent:     #66D7B7;
 }
 
 *, *::before, *::after {

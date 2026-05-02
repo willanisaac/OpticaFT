@@ -2,6 +2,7 @@
   import { supabase } from '../lib/supabaseClient.js';
   import './Auth.css';
   import kapisg from '../assets/kapisg.png';
+  import vexalBg from '../assets/vexal.png';
   import { onMount } from 'svelte';
 
   let isLogin = true;
@@ -43,7 +44,6 @@
       errors: {
         loginRequired: 'Ingresa correo y contraseña.',
         signupRequired: 'Completa correo, contraseña y nombre.',
-        invalidDomain: 'El correo debe pertenecer al dominio manpowergroup.ec',
         passwordMismatch: 'Las contraseñas no coinciden.',
         nameRequired: 'Ingresa tu nombre completo.',
         loginError: 'Error al iniciar sesión.',
@@ -55,7 +55,6 @@
   function toggleMode() { isLogin = !isLogin; isForgotPassword = false; error = ''; password = ''; confirmPassword = ''; }
   function toggleForgotPassword() { isForgotPassword = !isForgotPassword; error = ''; password = ''; confirmPassword = ''; }
 
-  const requireManpowerDomain = true;
 
   async function handleResetPassword() {
     error = '';
@@ -78,7 +77,6 @@
   async function handleSubmit() {
     error = '';
     if (!email || (!isForgotPassword && !password)) { error = isLogin ? t.auth.errors.loginRequired : t.auth.errors.signupRequired; return; }
-    if (!isLogin && requireManpowerDomain) { const domain = email.toLowerCase().split('@')[1] || ''; if (domain !== 'manpowergroup.ec') { error = t.auth.errors.invalidDomain; return; } }
     if (!isLogin && password !== confirmPassword) { error = t.auth.errors.passwordMismatch; return; }
     if (!isLogin && !displayName.trim()) { error = t.auth.errors.nameRequired; return; }
 
@@ -126,6 +124,7 @@
 </script>
 
 <div class="auth-container">
+  <div class="auth-bg" style="background-image: url({vexalBg})"></div>
   <div class="auth-card">
       <div class="auth-header">
       <div class="auth-header-content">

@@ -1,9 +1,12 @@
 <script>
   export let currentRoute = '/dashboard';
+  export let collapsed = false;
   export let onNavigate = (_path) => {};
+  export let onToggleCollapse = () => {};
 
   const navItems = [
     { path: '/dashboard', label: 'Panel', icon: '🏠' },
+    { path: '/inventario', label: 'Inventario', icon: '📦' },
     // Añade aquí más páginas cuando las crees:
     // { path: '/pacientes', label: 'Pacientes', icon: '👤' },
     // { path: '/citas',     label: 'Citas',     icon: '📅' },
@@ -14,42 +17,20 @@
 <style>
   .sidebar {
     position: fixed;
-    top: 0;
+    top: 60px;
     left: 0;
-    width: 220px;
-    height: 100vh;
-    background: linear-gradient(180deg, var(--primary, #02d3ce) 0%, var(--secondary, #a5ba07) 100%);
+    width: var(--sidebar-width, 220px);
+    height: calc(100vh - 60px);
+    background:
+      radial-gradient(120px 120px at 18% 6%, rgba(102,215,183,0.28), transparent 70%),
+      linear-gradient(180deg, #262626 0%, #1F1F1F 55%, #141414 100%);
     display: flex;
     flex-direction: column;
     z-index: 110;
-    border-right: none;
-    box-shadow: 2px 0 12px rgba(2,211,206,0.15);
+    border-right: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 4px 0 18px rgba(0,0,0,0.26);
     padding-top: 0;
-  }
-
-  .sidebar-brand {
-    height: 56px;
-    display: flex;
-    align-items: center;
-    padding: 0 1.25rem;
-    background: rgba(0,0,0,0.12);
-    border-bottom: 1px solid rgba(255,255,255,0.20);
-    gap: 0.6rem;
-  }
-
-  .brand-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: var(--secondary, #a5ba07);
-    flex-shrink: 0;
-  }
-
-  .brand-name {
-    color: #fff;
-    font-weight: 700;
-    font-size: 1rem;
-    letter-spacing: 0.04em;
+    transition: width 0.22s ease;
   }
 
   nav {
@@ -67,6 +48,12 @@
     font-weight: 600;
   }
 
+  .nav-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   .nav-btn {
     display: flex;
     align-items: center;
@@ -76,7 +63,7 @@
     border: none;
     color: rgba(255,255,255,0.85);
     font-size: 0.9rem;
-    padding: 0.65rem 1.25rem;
+    padding: 0.65rem 1rem;
     cursor: pointer;
     text-align: left;
     border-left: 3px solid transparent;
@@ -86,14 +73,14 @@
   }
 
   .nav-btn:hover {
-    background: rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.11);
     color: #fff;
   }
 
   .nav-btn.active {
-    background: rgba(255,255,255,0.22);
-    color: #fff;
-    border-left-color: #fff;
+    background: linear-gradient(90deg, rgba(102,215,183,0.22), rgba(102,215,183,0.06));
+    color: #66D7B7;
+    border-left-color: #66D7B7;
     font-weight: 600;
   }
 
@@ -105,32 +92,91 @@
   }
 
   .sidebar-footer {
-    padding: 1rem 1.25rem;
+    padding: 0.85rem 0.9rem;
     border-top: 1px solid rgba(255,255,255,0.20);
-    color: rgba(255,255,255,0.40);
+    color: rgba(255,255,255,0.52);
     font-size: 0.7rem;
     text-align: center;
   }
+
+  .collapse-btn {
+    width: 100%;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.22);
+    color: #ffffff;
+    border-radius: 8px;
+    padding: 0.45rem 0.55rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.18s ease;
+  }
+
+  .collapse-btn:hover {
+    background: rgba(102,215,183,0.22);
+  }
+
+  .sidebar.compact .nav-section-title,
+  .sidebar.compact .nav-label,
+  .sidebar.compact .footer-version,
+  .sidebar.compact .collapse-label {
+    opacity: 0;
+    width: 0;
+    margin: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .sidebar.compact .nav-btn {
+    justify-content: center;
+    border-left-width: 0;
+    border-radius: 8px;
+    margin: 2px 0.4rem;
+    padding: 0.62rem 0.35rem;
+  }
+
+  .sidebar.compact .nav-icon {
+    width: auto;
+    margin: 0;
+  }
+
+  .sidebar.compact .sidebar-footer {
+    padding-left: 0.4rem;
+    padding-right: 0.4rem;
+  }
+
+  .sidebar.compact .collapse-btn {
+    padding-left: 0.3rem;
+    padding-right: 0.3rem;
+  }
+
+  @media (max-width: 860px) {
+    .sidebar {
+      width: var(--sidebar-width, 78px);
+    }
+  }
 </style>
 
-<aside class="sidebar">
-  <div class="sidebar-brand">
-    <span class="brand-dot"></span>
-    <span class="brand-name">OpticaFT</span>
-  </div>
-
+<aside class="sidebar {collapsed ? 'compact' : ''}" style={`--sidebar-width: ${collapsed ? 78 : 220}px`}>
   <nav>
     <p class="nav-section-title">Menú</p>
     {#each navItems as item}
       <button
         class="nav-btn {currentRoute === item.path ? 'active' : ''}"
         on:click={() => onNavigate(item.path)}
+        title={collapsed ? item.label : ''}
       >
         <span class="nav-icon">{item.icon}</span>
-        {item.label}
+        <span class="nav-label">{item.label}</span>
       </button>
     {/each}
   </nav>
 
-  <div class="sidebar-footer">v0.1.0</div>
+  <div class="sidebar-footer">
+    <button class="collapse-btn" on:click={onToggleCollapse}>
+      <span aria-hidden="true">{collapsed ? '⟩' : '⟨'}</span>
+      <span class="collapse-label">&nbsp;{collapsed ? 'Expandir' : 'Colapsar'}</span>
+    </button>
+    <div class="footer-version">v0.1.0</div>
+  </div>
 </aside>
